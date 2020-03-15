@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <title>Autonavigator</title>
+</head>
+<body>
+<div id="app" class="container">
+  <h1>Input your data and praise the emperor!</h1>
+
+  <form @submit="calculate" action="#" method="post" id="navigationForm">
+    <div v-if="errors.length">
+      <b>Please fix input data:</b>
+      <ul>
+        <li v-for="error in errors"><span class="invalid-feedback" style="display: block">{{ error }}</span></li>
+      </ul>
+    </div>
+    <div class="row">
+      <div class="col">
+        <input type="number" class="form-control" required placeholder="Navigate (Warp)" v-model.number="navigateWarp">
+      </div>
+      <div class="col">
+        <input type="number" class="form-control" required placeholder="Awareness" name="awareness"
+               v-model.number="awareness">
+      </div>
+      <div class="col">
+        <input type="number" class="form-control" placeholder="Bonus" name="bonus" v-model.number="bonus">
+      </div>
+      <div class="col">
+        <input type="number" class="form-control" required placeholder="Estimated Duration"
+               v-model.number="estimatedDuration">
+      </div>
+      <div class="col">
+        <button type="submit" v-on:click="calculate" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </form>
+
+  <div v-if="calculated">
+    <h3>Travel time: {{ realTravelTime }} day(s)</h3>
+    <h3>Travel logs: </h3>
+    <div class="alert alert-secondary" role="alert" v-for="log in travelLogs">{{ log }}</div>
+    <h3>Travel events: </h3>
+    <div class="alert alert-primary" role="alert" v-for="event in travelEvents">{{ event }}</div>
+
+
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+          integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script>
+    let app = new Vue({
+      el: '#app',
+      data: {
+        errors: [],
+
+        navigateWarp: undefined,
+        awareness: undefined,
+        bonus: undefined,
+        estimatedDuration: undefined,
+
+        calculated: false,
+        realTravelTime: undefined,
+        travelLogs: [],
+        travelEvents: [],
+      },
+
+      methods: {
+        _make_request: function (data) {
+          console.log("requested ", data);
+          this._process_response({
+            "realTravelTime": 120,
+            "travelLogs": ["Navigator is right about travel duration", "Navigator successfully located astronomicon", "Navigator is aware about dangers on course. Has: 3.8 DOS on roll", "Navigator could not find safe exit from warp. Something bad happens when exiting to realspace."],
+            "travelEvents": ["test8", "ALL IS WELL! PRAISE THE EMPEROR!", "ALL IS WELL! PRAISE THE EMPEROR!", "ALL IS WELL! PRAISE THE EMPEROR!", "ALL IS WELL! PRAISE THE EMPEROR!", "test10", "ALL IS WELL! PRAISE THE EMPEROR!", "ALL IS WELL! PRAISE THE EMPEROR!", "test6", "ALL IS WELL! PRAISE THE EMPEROR!", "test10", "test6", "test5", "ALL IS WELL! PRAISE THE EMPEROR!", "test9", "test7", "test8", "ALL IS WELL! PRAISE THE EMPEROR!", "ALL IS WELL! PRAISE THE EMPEROR!", "ALL IS WELL! PRAISE THE EMPEROR!", "test5", "test7", "ALL IS WELL! PRAISE THE EMPEROR!", "ALL IS WELL! PRAISE THE EMPEROR!"]
+          });
+        },
+        _process_response: function (data) {
+          this.realTravelTime = data.realTravelTime;
+          this.travelLogs = data.travelLogs;
+          this.travelEvents = data.travelEvents;
+          this.calculated = true;
+        },
+        calculate: function (event) {
+          this.errors = [];
+
+          if (!(this.navigateWarp && this.awareness && this.estimatedDuration)) {
+            this.calculated = false;
+
+            if (!this.navigateWarp) {
+              this.errors.push('Please select Navigate (Warp)');
+            }
+
+            if (!this.awareness) {
+              this.errors.push('Please select Awareness');
+            }
+
+            if (!this.estimatedDuration) {
+              this.errors.push('Please select Estimated Duration');
+            }
+
+            return false;
+          }
+          event.preventDefault();
+
+          this._make_request({
+            "navigateWarp": this.navigateWarp,
+            "awareness": this.awareness,
+            "bonus": this.bonus | 0,
+            "estimatedDuration": this.estimatedDuration
+          });
+        }
+      }
+    });
+
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+          integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+          crossorigin="anonymous"></script>
+</body>
